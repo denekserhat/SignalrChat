@@ -12,14 +12,15 @@ using SIGNALRCHAT.Context;
 namespace SIGNALRCHAT.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250217184752_userAndChatAdded")]
-    partial class userAndChatAdded
+    [Migration("20250218085907_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasDefaultSchema("public")
                 .HasAnnotation("ProductVersion", "9.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
@@ -46,7 +47,32 @@ namespace SIGNALRCHAT.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Chats");
+                    b.ToTable("Chats", "public");
+                });
+
+            modelBuilder.Entity("SIGNALRCHAT.Models.File", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<byte[]>("Content")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Files", "public");
                 });
 
             modelBuilder.Entity("SIGNALRCHAT.Models.User", b =>
@@ -55,9 +81,8 @@ namespace SIGNALRCHAT.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Avatar")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("FileId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -69,7 +94,20 @@ namespace SIGNALRCHAT.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.HasIndex("FileId");
+
+                    b.ToTable("Users", "public");
+                });
+
+            modelBuilder.Entity("SIGNALRCHAT.Models.User", b =>
+                {
+                    b.HasOne("SIGNALRCHAT.Models.File", "File")
+                        .WithMany()
+                        .HasForeignKey("FileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("File");
                 });
 #pragma warning restore 612, 618
         }

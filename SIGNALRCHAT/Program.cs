@@ -1,5 +1,6 @@
-using Microsoft.EntityFrameworkCore;
 using SIGNALRCHAT.Context;
+using Microsoft.EntityFrameworkCore;
+using SIGNALRCHAT.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(opt => opt.UseNpgsql(
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -22,5 +25,5 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-
+app.MapHub<ChatHub>("/chat-hub");
 app.Run();

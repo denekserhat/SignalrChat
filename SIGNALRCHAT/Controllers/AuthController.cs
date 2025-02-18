@@ -29,7 +29,7 @@ namespace SIGNALRCHAT.Controllers
             User user = new User
             {
                 Name = request.Name,
-                Avatar = avatarId
+                FileId = avatarId
             };
 
             await context.AddAsync(user, cancellationToken);
